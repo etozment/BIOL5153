@@ -15,7 +15,7 @@ Utah Valley University Orem, UT<br/>Graduation date Spring 2015
 _BS in Biotechnology_
 GPA: 3.25
 
-#####Highlighted Courses and Techniques:
+##### Highlighted Courses and Techniques:
 * Biochemistry I & II (biological perspective)
 * Biochemistry (chemical perspective)
 * Molecular Biology
