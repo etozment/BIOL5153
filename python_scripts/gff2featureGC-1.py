@@ -1,5 +1,9 @@
 #!/usr/bin/env python3.6
 
+#add function to find reverse compliment
+#modify nuc_freq to find GC content
+#something to print/store/build the CDS for each gene
+
 #finds GC content of features in watermelon mt genome
 import sys
 
@@ -9,11 +13,30 @@ def clean_seq(raw_seq):
 	clean=clean.replace('N','')
 	return clean
 	
-def nuc_freq(sequence, base, sig_figs=2):
-	lngth=len(sequence)
-	nuc_count=sequence.count(base)
-	frequency=nuc_count/lngth*100
-	return (lngth,round(frequency, sig_figs))
+def gc_cont(sequence, sig_figs=2):
+	length=len(sequence)
+	gc_content=(sequence.count('C')+sequence.length('G'))/lngth*100
+	return (length,round(gc_content, sig_figs))
+
+#reverse compliment
+def rev_com (sequence):
+	sequence=sequence.upper()
+	#compliment the bases
+#A to T
+	com1=sequence.replace('A','t')
+#C to G
+	com2=com1.replace('C','g')
+#G to C
+	com3=com2.replace('G','c')
+#T to A
+	com4=com3.replace('T','a')
+#reverse
+	r_com=com4[::-1].upper()
+	return r_com
+
+	
+#key=feature type, value=sequences of that type
+feat_seq={}
 
 #set up usage statement
 usage=sys.argv[0]+' genome.fasta features.gff'
@@ -58,55 +81,40 @@ for line in gff:
 
 #sort into strings by feature type and end loop
 
+	if column[2] in feat_seq:
+		feat_seq[column[2]]+=fragment
+	else:
+		feat_seq[column[2]]=fragment
 
-	
-	#get exons
-	if column[2]=='CDS':
-# 		print (len(dna[start-1:stop]))
-# 		print (column)
-		exon=exon+fragment
-# 		print (exon)
-# 	print (len(exon))
-	#get introns
-	if column[2]=='intron':
-		intron=intron+fragment
-		#print (intron)
-	#get misc_features
-	if column[2]=='misc_feature':
-		misc_feature=misc_feature+fragment
-	if column[2]=='rRNA':
-		rrna=rrna+fragment
-	if column[2]=='repeat_region':
-		repeat=repeat+fragment
-	if column[2]=='tRNA':
-		trna=trna+fragment
-# print(len(exon))
-#print(rrna)
+for type, sequence in feat_seq.items():
+	print(type+'	'+str(len(sequence)))
+
+
 
 #find %of genome occupied by each feature type
-ex_pc=len(exon)/len(dna)*100
-in_pc=len(intron)/len(dna)*100
-misc_pc=len(misc_feature)/len(dna)*100
-rrna_pc=len(rrna)/len(dna)*100
-rep_pc=len(repeat)/len(dna)*100
-trna_pc=len(trna)/len(dna)*100
-
-count=-1
-feature_type=['exon', 'intron', 'misc_feature', 'repeat', 'rrna', 'trna']
-
-for type in [exon, intron, misc_feature, repeat, rrna, trna]:
-	count=count+1
-	for nucleotide in ['A', 'C', 'G', 'T']:
-		(seq_len,nt_freq)=nuc_freq(type, nucleotide)
-		#print (seq_len)
-		print (feature_type[count]+'	'+str(seq_len)+'	'+str(nt_freq))
-#calculate GC content of each feature
-ex_gc=((exon.count('C')+exon.count('G'))/len(exon))*100
-in_gc=((intron.count('C')+intron.count('G'))/len(intron))*100
-misc_gc=((misc_feature.count('C')+misc_feature.count('G'))/len(misc_feature))*100
-rep_gc=((repeat.count('C')+repeat.count('G'))/len(repeat))*100
-rrna_gc=((rrna.count('C')+rrna.count('G'))/len(rrna))*100
-trna_gc=((trna.count('C')+trna.count('G'))/len(trna))*100
+# ex_pc=len(exon)/len(dna)*100
+# in_pc=len(intron)/len(dna)*100
+# misc_pc=len(misc_feature)/len(dna)*100
+# rrna_pc=len(rrna)/len(dna)*100
+# rep_pc=len(repeat)/len(dna)*100
+# trna_pc=len(trna)/len(dna)*100
+# 
+# count=-1
+# feature_type=['exon', 'intron', 'misc_feature', 'repeat', 'rrna', 'trna']
+# 
+# for type in [exon, intron, misc_feature, repeat, rrna, trna]:
+# 	count=count+1
+# 	for nucleotide in ['A', 'C', 'G', 'T']:
+# 		(seq_len,nt_freq)=nuc_freq(type, nucleotide)
+# 		#print (seq_len)
+# 		print (feature_type[count]+'	'+str(seq_len)+'	'+str(nt_freq))
+# #calculate GC content of each feature
+# ex_gc=((exon.count('C')+exon.count('G'))/len(exon))*100
+# in_gc=((intron.count('C')+intron.count('G'))/len(intron))*100
+# misc_gc=((misc_feature.count('C')+misc_feature.count('G'))/len(misc_feature))*100
+# rep_gc=((repeat.count('C')+repeat.count('G'))/len(repeat))*100
+# rrna_gc=((rrna.count('C')+rrna.count('G'))/len(rrna))*100
+# trna_gc=((trna.count('C')+trna.count('G'))/len(trna))*100
 
 #print results
 # print ('exon		'+str(len(exon))+'	('+str("%.1f"% ex_pc)+'%)	'+str("%.2f"% ex_gc))
