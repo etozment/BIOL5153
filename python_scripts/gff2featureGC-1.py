@@ -33,7 +33,11 @@ def rev_com (sequence):
 #reverse
 	r_com=com4[::-1].upper()
 	return r_com
-
+	
+#key-gene name, value- another dictionary[key-exon number, value- exon sequence]
+#gene sequences[cox1][1]='The sequence for the the first exon of cox 1'
+#gene sequences[cox1][2]='The sequence for the the second exon of cox 1'
+gene_sequences={}
 	
 #key=feature type, value=sequences of that type
 feat_seq={}
@@ -74,22 +78,70 @@ for line in gff:
 	start=int(column[3])
 	stop=int(column[4])
 	
+	if column[2]=='CDS':
+	#get gene name
+		attributes=column[8].split(' ; ')
+		#print (attributes[0])
+		
+		gene_fields=attributes[0].split(' ')
+		gene_name=gene_fields[1]
+		#print(gene_name)
+		
+#	print (column[8])
+	#get exon number
+		#exon_num=gene_fields[3]
+		# if 'exon' in gene_fields:
+# 			exon_num=gene_fields[3]
+# 			print (gene_name,exon_num)
+# 		else:
+# 			print(gene_name)
+	
+	#extract/clean sequence
 	fragment=dna[start-1:stop]
 	
 	fragment=clean_seq(fragment)
+	#determine whether + or - strand
+	if column[6]=='-':
+		fragment=rev_com(fragment)
+		
+	#determine if there are multiple exons
+	if 'exon' in gene_fields:
+		exon_num=gene_fields[3]
+		gene=gene_name+'_'+exon_num
+	else:
+		gene=gene_name
+		
+	#print(gene)
 # 	print (column[3])
 
 #sort into strings by feature type and end loop
 
-	if column[2] in feat_seq:
-		feat_seq[column[2]]+=fragment
+	# if column[2] in feat_seq:
+# 		feat_seq[column[2]]+=fragment
+# 	else:
+# 		feat_seq[column[2]]=fragment
+# 
+# for type, sequence in feat_seq.items():
+# 	print(type+'	'+str(len(sequence)))
+
+	
+#store the sequence in gene_sequences
+
+# 	if 'exon' in gene_fields:
+# 		if gene_name in gene_sequences:
+# 			gene_sequences[gene_name]+=
+	if gene in gene_sequences:
+		gene_sequences[gene]+=fragment
 	else:
-		feat_seq[column[2]]=fragment
-
-for type, sequence in feat_seq.items():
-	print(type+'	'+str(len(sequence)))
-
-
+		gene_sequences[gene]=fragment
+# 	
+# print (gene_sequences['cox1_1'])
+#create and open output file
+	file_name='watermelon.nt/'+gene_name+'.fasta'
+	file=open(file_name,'a')
+	#append data into file
+	file_name.write('>'+gene+'\n'+gene_sequences[gene])
+	file.close()		
 
 #find %of genome occupied by each feature type
 # ex_pc=len(exon)/len(dna)*100
